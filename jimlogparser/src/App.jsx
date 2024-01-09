@@ -3,25 +3,29 @@ import './App.css'
 import { useEffect } from 'react'
 import { useCallback } from 'react'
 
+class LineCountError extends Error {}
+
 function App() {
 	const [fileContent, setFileContent] = useState('')
 
 	const handleFileChange = (event) => {
 	  const file = event.target.files[0]
-  
 	  if (file) {
 		const reader = new FileReader()
-  
 		reader.onload = (e) => {
 		  const content = e.target.result
 		  setFileContent(content)
 		}
-  
 		reader.readAsText(file)
 	  }
 	}
 
-	const timeStampRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+	const assertParseResult = useCallback(( linesArr, output) => {
+		const entryCount = linesArr.filter(l => l.slice(0,4) === new Date().getFullYear() + '').length
+		if (entryCount !== output.length){
+			throw new LineCountError('LineCountError', entryCount, ' => ' , output.length)
+		}
+	},[])
 
 	const parseTextLogWithConsole = useCallback(() => {
 		if (!fileContent) return 
@@ -52,7 +56,14 @@ function App() {
 			}
 		}
 
-		console.log(output)
+		try {
+			assertParseResult(lines, output)
+		} catch (e) {
+			console.log(e)
+		} finally {
+			console.log(output)
+		}
+
 	},[fileContent])
 
 	useEffect(() => {
