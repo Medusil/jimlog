@@ -2,11 +2,13 @@ import { useState } from 'react'
 import './App.css'
 import { useEffect } from 'react'
 import { useCallback } from 'react'
+import ReactJson from 'react-json-view'
 
 class LineCountError extends Error {}
 
 function App() {
 	const [fileContent, setFileContent] = useState('')
+	const [parsedContent, setParsedContent] = useState([])
 
 	const handleFileChange = (event) => {
 	  const file = event.target.files[0]
@@ -31,13 +33,14 @@ function App() {
 		if (!fileContent) return 
 		const output = []
 		const lines = fileContent.split('\r\n')
+		
 		for (const l of lines) {
 			if (l.slice(0,4) === new Date().getFullYear() + '') {
 				if (l.includes('{')) {
 					const presumedJsonStart = l.indexOf('{')
 					output.push({
 						"action": l.slice(26,presumedJsonStart),
-						"json": JSON.parse(l.slice(presumedJsonStart))
+						"json": JSON.parse(l.slice(presumedJsonStart)),
 					})
 					continue
 				}
@@ -47,7 +50,7 @@ function App() {
 				try {
 					output[output.length -1] = {
 						"action": output[output.length -1],
-						"json": JSON.parse(l.slice(presumedJsonStart))
+						"json": JSON.parse(l.slice(presumedJsonStart)),
 					}
 				} catch (e) {
 					console.log('ERROR:', e)
@@ -62,6 +65,7 @@ function App() {
 			console.log(e)
 		} finally {
 			console.log(output)
+			setParsedContent(output)
 		}
 
 	},[fileContent])
@@ -79,7 +83,16 @@ function App() {
 		/>
 		<div>
 		  
-		  {!fileContent ? <h2>Upload PlainText Log File</h2> : 'Formatted output in console'}
+		  {!fileContent ? <h2>Upload PlainText Log File</h2> : 
+		  <div>
+		  	Formatted output in console
+			<ReactJson src={parsedContent} theme="rjv-default" collapsed={2}
+			displayDataTypes={false}
+			displayObjectSize={true}
+				style={{width: '90vw'}}
+			/>
+		  </div>
+		  }
 		</div>
 	  </div>
 	);
