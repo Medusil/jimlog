@@ -40,12 +40,12 @@ function App() {
 				if (l.includes('{')) {
 					const presumedJsonStart = l.indexOf('{')
 					output.push({
-						"action": l.slice(26,presumedJsonStart),
+						"action": l.slice(0,presumedJsonStart),
 						"json": JSON.parse(l.slice(presumedJsonStart)),
 					})
 					continue
 				}
-				output.push(l.slice(26))
+				output.push(l.slice(0))
 			} else {
 				const presumedJsonStart = l.indexOf('{')
 				try {
