@@ -9,6 +9,7 @@ class LineCountError extends Error {}
 function App() {
 	const [fileContent, setFileContent] = useState('')
 	const [parsedContent, setParsedContent] = useState([])
+	const [depth, setDepth] = useState(2)
 
 	const handleFileChange = (event) => {
 	  const file = event.target.files[0]
@@ -75,7 +76,7 @@ function App() {
 	},[fileContent])
   
 	return (
-	  <div>
+	  <div style={{width: '90vw'}}>
 		<input
 		  type="file"
 		  onChange={handleFileChange}
@@ -86,10 +87,17 @@ function App() {
 		  {!fileContent ? <h2>Upload PlainText Log File</h2> : 
 		  <div>
 		  	Formatted output in console
-			<ReactJson src={parsedContent} theme="rjv-default" collapsed={2}
+			<div>
+				Collapsed after depth
+				<input style={{marginLeft: '1em', width: '3em'}} type="number" step='1' value={depth} onChange={(e) => {
+					const val = Number(e.target.value)
+					if (Number.isFinite(val)) 
+						setDepth(val)
+					}}/>
+			</div>
+			<ReactJson src={parsedContent} theme="rjv-default" collapsed={depth}
 			displayDataTypes={false}
 			displayObjectSize={true}
-				style={{width: '90vw'}}
 			/>
 		  </div>
 		  }
