@@ -23,20 +23,14 @@ function App() {
 		}
 	}
 
-	const assertParseResult = useCallback((linesArr, output) => {
-		const entryCount = linesArr.filter(l => l.slice(0, 4) === new Date().getFullYear() + '').length
-		if (entryCount !== output.length) {
-			throw new LineCountError('LineCountError', entryCount, ' => ', output.length)
-		}
-	}, [])
-
 	const parseTextLogWithConsole = useCallback(() => {
 		if (!fileContent) return
 		const output = []
-		const lines = fileContent.split('\r\n')
+		const lines = fileContent.split(/\r?\n/)
+		let i = -1
 
 		for (const l of lines) {
-			if (l === '') continue
+			i++
 			if (l.slice(0, 4) === new Date().getFullYear() + '') {
 				if (l.includes('{')) {
 					const presumedJsonStart = l.indexOf('{')
@@ -55,20 +49,16 @@ function App() {
 						"json": JSON.parse(l.slice(presumedJsonStart)),
 					}
 				} catch (e) {
-					console.log('ERROR at line:', l)
+					console.log('ERROR at line:', i)
+					console.log('line value: ', l)
 					console.log(e)
+					output.push(l)
 				}
 			}
 		}
-
-		try {
-			assertParseResult(lines, output)
-		} catch (e) {
-			console.log(e)
-		} finally {
-			console.log(output)
-			setParsedContent(output)
-		}
+		
+		console.log(output)
+		setParsedContent(output)
 
 	}, [fileContent])
 
