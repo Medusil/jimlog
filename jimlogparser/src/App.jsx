@@ -56,13 +56,46 @@ function App() {
 				}
 			}
 		}
-		
+
 		console.log(output)
 		setParsedContent(output)
 
 	}, [fileContent])
 
+/* 	const parseExercise = useCallback(() => {
+		if (!fileContent) return
+
+		const lines = fileContent.split(/\r?\n/)
+		
+		const output = {}
+		let activeSection
+		let sectionObject
+
+		for (const line of lines) {
+			if (/^\s*$/.test(line)) continue  // contains only whitespace characters
+			if (/^;/.test(line)) continue // starts with semicolon
+
+			if (/^\[\w*\]$/.test(line)) {  // found new section
+				if (sectionObject) output[activeSection] = sectionObject  // if old section, save it to output
+				activeSection = line.slice(1, line.length - 1)
+				sectionObject = {}
+				continue
+			}
+
+			if (/^\w+=/.test(line)) {
+				const [match] = /^\w+=/.exec(line)
+				!activeSection ? output[match.slice(0,-1)] = line.slice(match.length) : sectionObject[match.slice(0,-1)] = line.slice(match.length)
+				continue
+			}
+		}
+
+		output[activeSection] = sectionObject
+		console.log(output)
+		setParsedContent(output)
+	}, [fileContent]) */
+
 	useEffect(() => {
+		//parseExercise()
 		parseTextLogWithConsole()
 	}, [fileContent])
 
